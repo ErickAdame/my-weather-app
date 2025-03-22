@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Precip Forecast</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #1c1c1c;
+      color: white;
+      margin: 0;
+      padding: 0px;
+    }
+    .banner2 {
+      background-color: #333333;
+      color: white;
+      padding: 5px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .snow-forecast-container {
+      background-color: rgba(3, 76, 149, 0.506);
+      padding-top: 0px;
+      padding-bottom: 7px;
+      padding-right: 5px;
+      padding-left: 5px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      color: white;
+    }
+    p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      color: white;
+    }
+    #snow-chart, #precip-hourly-chart, #precip-minutely-chart {
+      margin-top: 10px;
+      margin-bottom: 20px; /* Add spacing between each chart and the next banner */
+      width: 100%; /* Make the chart full width */
+      max-width: 1000px; /* Set a maximum width for the chart */
+      height: 500px; /* Set a fixed height for the chart */
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    .banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #161616;
+    color: white;
+    font-size: 24px;
+    height: 40px;
+}
+
+.banner-icon {
+    width: 60px; /* Adjust the size of the icon as needed */
+    height: 60px;
+    margin-right: 1px; /* Space between icon and text */
+
+}
+.top-button-container {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 10px; /* Adjust the gap between buttons */
+    margin-top: 10px;
+    text-align: center; /* Center the text horizontally */
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-bottom: 15px;
+}
+
+.top-button {
+    background-color: rgba(51, 51, 51, 0.6); /* 40% transparent background */
+    color: #ccc; /* Lighter text color */
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.minutely-explanation {
+  background-color: #2c2c2c;
+  color: #f5f5f5;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: left;
+}
+
+  </style>
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="banner">
+    <img src="icons/day/Sun 2.png" alt="Weather Icon" class="banner-icon">
+    <span class="banner-text">Precipitation Insights</span>
+</div>
+  <div class="top-button-container">
+    <a href="index.html" class="top-button">Go Back to Home</a>
+    <a href="https://moondetails.tiiny.co" class="top-button">Moon Phase</a>
+    <a href="https://www.youtube.com/@ErickAdameAPP/streams" class="top-button">Live Stream</a>
+    <a href="https://www.erickadameontv.com/weather-notifications" class="top-button">Notifications</a>
+</div>
+
+  <!-- Banner for Snow Forecast -->
+  <div class="banner2">Snow Forecast By Hour</div>
+
+  <div class="snow-forecast-container">
+    <p id="snowtotal">Loading snow forecast...</p>
+  </div>
+
+  <!-- Canvas for Snow Chart -->
+  <canvas id="snow-chart"></canvas>
+
+    <!-- Banner for Minutely Precipitation Forecast -->
+    <div class="banner2">Precipitation Intensity - Next Hour</div>
+
+    <!-- Canvas for Minutely Precipitation Chart -->
+    <canvas id="precip-minutely-chart"></canvas>
+
+  <!-- Banner for Hourly Precipitation Forecast -->
+  <div class="banner2">Hourly Precipitation Amounts</div>
+
+  <!-- Canvas for Hourly Precipitation Chart -->
+  <canvas id="precip-hourly-chart"></canvas>
+
+  <!-- Banner for Minutely Precipitation Forecast -->
+  <div class="banner2">Daily Precipitation Chances</div>
+
+  <!-- Canvas for Minutely Precipitation Chart -->
+  <canvas id="precip-daily-chart"></canvas>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+  
+<script>
+    // Retrieve snow data from localStorage
+    const snowData = JSON.parse(localStorage.getItem('snowForecastData'));
+    const snowTotal = snowData ? snowData.reduce((total, current) => total + current.snow, 0) : 0;
+
+    // Get the snowtotal element and display the total snow forecast
+    const snowTotalElement = document.getElementById('snowtotal');
+    snowTotalElement.textContent = snowTotal > 0 ? `${snowTotal.toFixed(1)}" of snow can be expected in the next 24 hours` : 'No snow expected in the next 24 hours';
+
+    // Prepare snow data for the chart
+    const snowHours = snowData.map(item => item.time);
+    const snowAmounts = snowData.map(item => item.snow);
+
+snowChart = document.getElementById("snow-chart");
+
+// Check if snowTotal is zero and hide the canvas if true
+if (snowTotal === 0) {
+  snowChart.style.display = "none";
+  document.querySelector('.banner2').style.display = 'none';
+  document.querySelector('.snow-forecast-container').style.display = 'none';
+} else {
+  snowChart.style.display = "block";
+  document.querySelector('.banner2').style.display = 'block';
+  document.querySelector('.snow-forecast-container').style.display = 'inline-block';
+}
+
+
+
+
+// Create the snow forecast chart
+const ctxSnow = document.getElementById('snow-chart').getContext('2d');
+new Chart(ctxSnow, {
+  type: 'bar',
+  data: {
+    labels: snowHours,
+    datasets: [{
+      data: snowAmounts,
+      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+      borderColor: 'rgba(255, 255, 255, 1)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false // Disable the legend
+      },
+      tooltip: {
+        enabled: true, // Keep tooltip enabled
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Optional: Add a darker background for the tooltip
+        bodyColor: '#fff', // Optional: Make the tooltip text white
+        displayColors: false, // Disable the color box in the tooltip
+        callbacks: {
+          title: function(tooltipItem) {
+            return `Time: ${tooltipItem[0].label}`; // Display time label
+          },
+          label: function(tooltipItem) {
+            return `Snow: ${tooltipItem.raw}"`; // Display the snow amount
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Time' },
+        ticks: {
+          maxRotation: 90,
+          minRotation: 90
+        }
+      },
+      y: {
+        title: { display: true, text: 'Snow Per Hour' },
+        ticks: { stepSize: 0.25 }
+      }
+    }
+  }
+});
+
+
+
+
+    // Retrieve hourly precipitation data from localStorage
+    const precipHourlyData = JSON.parse(localStorage.getItem('precipForecastData'));
+
+    let precipHourlyLabels = [];
+    let precipHourlyValues = [];
+
+    if (precipHourlyData && precipHourlyData.length > 0) {
+      precipHourlyLabels = precipHourlyData.map(item => item.time);
+      precipHourlyValues = precipHourlyData.map(item => item.precip);
+    }
+
+    // Find the maximum value in the hourly precipitation data
+    const maxPrecipHourly = Math.max(...precipHourlyValues);
+    const yAxisMax = maxPrecipHourly * 3; // Set max y-axis to 3 times the max value
+
+    // Create the hourly precipitation chart
+const ctxPrecipHourly = document.getElementById('precip-hourly-chart').getContext('2d');
+if (precipHourlyLabels.length > 0 && precipHourlyValues.length > 0) {
+  new Chart(ctxPrecipHourly, {
+    type: 'bar',
+    data: {
+      labels: precipHourlyLabels,
+      datasets: [{
+        label: 'Precipitation (inches)', // You can keep this label or remove it if you prefer
+        data: precipHourlyValues,
+        backgroundColor: 'rgba(34, 139, 34, 0.6)', // Medium green with 60% opacity
+        borderColor: 'rgba(34, 139, 34, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false // Disable the legend
+        },
+        tooltip: {
+          enabled: true, // Keep tooltip enabled
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Optional: Add a darker background for the tooltip
+          bodyColor: '#fff', // Optional: Make the tooltip text white
+          displayColors: false, // Disable the color box in the tooltip
+          callbacks: {
+            title: function(tooltipItem) {
+              return `Time: ${tooltipItem[0].label}`; // Display time label
+            },
+            label: function(tooltipItem) {
+              return `Precip: ${tooltipItem.raw}"`; // Display the precipitation value
+            }
+          }
+        }
+      },
+      scales: {
+        x: { 
+          title: { display: true, text: 'Time' },
+          ticks: {
+            maxRotation: 90,
+            minRotation: 90
+          }
+        },
+        y: { 
+          title: { display: true, text: 'Precipitation (inches)' },
+          suggestedMin: 0, // Ensure the y-axis starts at 0
+          suggestedMax: yAxisMax, // Set max y-axis to 3 times the max data value
+          ticks: { stepSize: 0.01 } // Set tick size to 0.01
+        }
+      }
+    }
+  });
+}
+
+
+// Retrieve minutely precipitation data from localStorage
+const minutelyData = JSON.parse(localStorage.getItem('minutelyData'));
+
+let precipMinutelyLabels = [];
+let precipMinutelyValues = [];
+const step = 5; // Change this to adjust how often you want to show the red points
+
+if (minutelyData && minutelyData.minutely && minutelyData.minutely.length > 0) {
+  minutelyData.minutely.forEach((item, index) => {
+    if (index % step === 0) { // Only include every 'step' index
+      precipMinutelyLabels.push(index); // Time (in minutes from now)
+      precipMinutelyValues.push(item.precipitation); // Precipitation value
+    }
+  });
+}
+
+// Create the minutely precipitation chart
+const ctxPrecipMinutely = document.getElementById('precip-minutely-chart').getContext('2d');
+if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
+  // Cap any value greater than or equal to 9 to 9
+  const cappedPrecipValues = precipMinutelyValues.map(value => value >= 9 ? 9 : value);
+
+  new Chart(ctxPrecipMinutely, {
+    type: 'line',
+    data: {
+      labels: precipMinutelyLabels,
+      datasets: [{
+        label: 'Precip Rate',
+        data: cappedPrecipValues, // Use the capped data
+        backgroundColor: 'rgba(255, 99, 132, 0.2)', // Light red fill for the chart
+        borderColor: 'rgba(255, 99, 132, 1)', // Red line
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(255, 0, 0, 1)', // Red points
+        pointRadius: 2, // Red circle size
+        pointStyle: 'circle', // Red circles for points
+        fill: false, // No fill under the line
+        tension: 0.4 // Make the line smoother (higher tension = more smooth)
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }, // Disable the legend
+        tooltip: {
+          enabled: true, // Ensure tooltip is enabled
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Optional: darker background for tooltip
+          bodyColor: '#fff', // Optional: white text color for tooltip
+          displayColors: false, // Disable the color box
+          callbacks: {
+            title: function(tooltipItem) {
+              // Display the time as "X mins from now"
+              return `${tooltipItem[0].label} mins from now`;
+            },
+            label: function(tooltipItem) {
+              // Display the precip rate as "Precip Rate: ## per hr"
+              return ``;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { 
+          title: { display: true, text: 'Minutes from now' },
+          ticks: {
+            stepSize: 5, // Show ticks every 5 minutes
+            maxTicksLimit: 6, // Limit number of ticks to 6 for less clutter
+            font: {
+              size: 10, // Make the ticks smaller
+            }
+          }
+        },
+        y: {
+          title: { display: false },
+          min: 0,
+          max: 10, // Fixed scale
+          ticks: {
+            stepSize: 2,
+            callback: function(value) {
+              if (value === 2) return "Light";
+              if (value === 4) return "Moderate";
+              if (value === 6) return "Heavy";
+              if (value === 8) return "Very Heavy"
+              return ""; // Empty string for all other value
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+// Retrieve daily precipitation probability data from localStorage
+const precipDailyData = JSON.parse(localStorage.getItem('sevenDayPop'));
+
+
+
+let precipDailyLabels = [];
+let precipDailyValues = [];
+
+if (precipDailyData && precipDailyData.length > 0) {
+  precipDailyLabels = precipDailyData.map(item => item.day); // Extract day names
+  precipDailyValues = precipDailyData.map(item => item.pop); // Extract chance of precipitation
+}
+
+
+
+// Create the daily precipitation probability chart
+const ctxPrecipDaily = document.getElementById('precip-daily-chart').getContext('2d');
+if (precipDailyLabels.length > 0 && precipDailyValues.length > 0) {
+  new Chart(ctxPrecipDaily, {
+    type: 'bar',
+    data: {
+      labels: precipDailyLabels,
+      datasets: [{
+        label: 'Chance of Precipitation (%)',
+        data: precipDailyValues,
+        backgroundColor: 'rgba(50, 205, 50, 1)', 
+        borderColor: 'rgba(30, 144, 255, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }, // Hide legend
+        tooltip: {
+          enabled: false,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          bodyColor: '#fff',
+          displayColors: false,
+          callbacks: {
+            title: (tooltipItem) => `Day: ${tooltipItem[0].label}`,
+            label: (tooltipItem) => `POP: ${tooltipItem.raw}%`
+          }
+        },
+        datalabels: { // Show values just above the bars
+          anchor: 'end', // Position near the top of the bar
+          align: 'bottom', // Move label slightly above the bar
+          offset: -15, // Adjust upward a bit
+          color: 'white',
+          font: {
+            weight: 'bold',
+            size: 10
+          },
+          formatter: (value) => value > 0 ? `${value}%` : '' // Hide 0% labels
+        }
+      },
+      scales: {
+        x: { 
+          title: { display: true, text: 'Day of the Week' }
+        },
+        y: { 
+          display: false, // Remove Y-axis labels
+          suggestedMin: 0, // Ensure the Y-axis starts at 0%
+          suggestedMax: 110 // Ensure room for 100% label above the bar
+        }
+      }
+    },
+    plugins: [ChartDataLabels] // Load Chart.js Data Labels plugin
+  });
+}
+
+
+
+
+  </script>
+</body>
+</html>

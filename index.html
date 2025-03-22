@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather with Erick</title>
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7991919118246798"
+     crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://static.elfsight.com/platform/platform.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="script.js" defer></script>
+
+    <!--GOOGLE FIREBASE-->
+        <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXJ-FC7XVMEhjx5uuN6smxWDrdKmKPzvc",
+    authDomain: "current-conditions-3f19e.firebaseapp.com",
+    projectId: "current-conditions-3f19e",
+    storageBucket: "current-conditions-3f19e.firebasestorage.app",
+    messagingSenderId: "975046283582",
+    appId: "1:975046283582:web:47b37075920883da6d1c6f",
+    measurementId: "G-FZFX14FMTK"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+      
+    <script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+<script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script><script defer data-domain="currentconditions.tiiny.co" src="https://analytics.tiiny.site/js/plausible.js"></script></head>
+<body>
+
+    <div class="background-wrapper">
+        <!-- Everything above the Hourly Forecast section -->
+        <div class="banner">
+            <img src="icons/day/Sun 2.png" alt="Weather Icon" class="banner-icon">
+            <span class="banner-text">Local Weather</span>
+        </div>
+        <div class="top-button-container">
+            <a href="https://maps.zoomradar.net/?key=ch9SKimlPV0Hfyk" class="top-button">Weather Radar</a>
+            <a href="https://moondetails.tiiny.co" class="top-button">Moon Phase</a>
+            <a href="https://www.youtube.com/@ErickAdameAPP/streams" class="top-button">Live Stream</a>
+            <a href="https://www.erickadameontv.com/weather-notifications" class="top-button">Notifications</a>
+        </div>
+
+        <div class="top-section">
+            <button id="toggleInputButton">Select a City</button>
+        </div>
+        <div class="container2">
+            <button id="refreshButton" class="refresh-button">
+                <i class="fas fa-sync-alt"></i> <!-- Font Awesome icon -->
+            </button>
+        </div>
+        
+        <!--Pop-Up Ad-->
+        <script src="https://static.elfsight.com/platform/platform.js" async></script>
+        <div class="elfsight-app-861242bc-ecd3-4edf-9b6c-803c96b83ea7" data-elfsight-app-lazy></div>
+
+        <div class="container autocomplete-container" id="inputSection" style="display: none;">
+            <div type="text" id="zipcodeInput"></div>
+            <button id="getWeatherButton">Get Weather</button>
+        </div>
+
+        <div class="container">
+            <div class="location">
+                <p id="location">No City Selected</p>
+            </div>
+            <div class="weather-info">
+                <div id="weatherDetails" style="display: none;">
+                    <div id="icon-container" style="display: flex; justify-content: center; align-items: center;">
+                        <img id="weatherIcon" src="" alt="Weather Icon">
+                        <div id="tempExtremes" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <p id="maxTemp">Hi:</p>
+                            <p id="minTemp">Lo:</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="temperature-container">
+                    <p id="temperature"></p>
+                </div>
+                <p id="feels_like">N/A</p>
+            </div>
+            <p id="weatherDescription">Waiting for data</p>
+            <div class="minutely-forecast">
+                <div id="minutely-forecast">
+                    <!-- Add dynamic content for minute-by-minute forecast -->
+                </div>
+                <div id="snowtotal">
+                    Snow data loading...
+                </div>
+                <p class="insights-text">
+                    <a href="precip.html" class="insights-link">Click here for more precipitation insights.</a>
+                </p>
+            </div>
+            
+            <div id="sunriseSunset" class="sunrise-sunset"></div>
+            <div id="alert-message-container">
+            <div id="alert-message" class="alert-message"></div>
+            </div>
+        </div>
+
+        <h3 class="checklistHeading">Today's Checklist</h3><div id="checklist" class="checklist"></div>
+
+
+
+        <div class="button-container">
+            <button id="hourlyButton" class="forecast-toggle">Hourly</button>
+            <button id="dailyButton" class="forecast-toggle">10-Day Forecast</button>
+            <button id="radarButton" class="forecast-toggle">Radar</button>
+            <button id="homeButton" class="forecast-toggle">Display All</button>
+        </div>
+        
+    </div> <!-- End of background-wrapper -->
+    <a href="mailto:sales@erickadameontv.com">
+        <img src="advertise.png" alt="Support Me" class="responsive-image">
+    </a>
+    
+
+    <div class="iframe-container inactive">
+        <div class="iframe-overlay">
+            Tap to activate map
+        </div>
+        <iframe 
+            src="https://maps.zoomradar.net/?key=ch9SKimlPV0Hfyk" 
+            frameborder="0" 
+            scrolling="no" 
+            allowfullscreen 
+            allow="geolocation">
+        </iframe>
+    </div>
+
+    
+<div class="elfsight-app-eb170527-bf2e-49c8-89d8-626fa3c6a741" data-elfsight-app-lazy></div>
+    <!-- Hourly Forecast section -->
+    <table id="hourlyForecast" style="display: none;"></table>
+
+    <div class="location">
+        <p id="location2" class="location-text">No City Selected</p>
+    </div>
+
+    <div id="sevenDayForecast" class="forecast-container">
+        <!-- Forecast cards will be generated here dynamically by JavaScript -->
+    </div>
+
+
+
+    <!-- Container for the bar graph -->
+    <div id="sevenDayBarGraphContainer" class="hidden">
+        <canvas id="sevenDayBarGraph"></canvas>
+        <p class="instructions">Click on center of graph, then click on specific day to see forecast</p>
+    </div>
+
+
+</body>
+</html>
