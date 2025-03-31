@@ -369,12 +369,12 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           min: 0,
           max: 10, // Fixed scale
           ticks: {
-            stepSize: 2,
+            stepSize: 1,
             callback: function(value) {
-              if (value === 2) return "Light";
-              if (value === 4) return "Moderate";
-              if (value === 6) return "Heavy";
-              if (value === 8) return "Very Heavy"
+              if (value === 1) return "Light";
+              if (value === 3) return "Moderate";
+              if (value === 7) return "Heavy";
+              if (value === 9) return "Very Heavy"
               return ""; // Empty string for all other value
             }
           }
