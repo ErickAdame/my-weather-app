@@ -357,31 +357,29 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           }
         }
       },
-      scales: {
-        x: { 
-          title: { display: true, text: 'Minutes from now' },
-          ticks: {
-            stepSize: 5,
-            maxTicksLimit: 5, // Show fewer ticks on X-axis
-            autoSkip: true, // Skip extra labels for less clutter
-            callback: function(value, index, values) {
-              if (value === 60) return "60"; // Force 60 to appear
-              return value; // Show other labels normally
-            }
-            includeBounds: true,
-            font: {
-              size: 12, 
-            },
-          suggestedMin: 0, 
-          suggestedMax: 60, // Ensures 60 is within range
-          },
-          grid: {
-            display: true,
-            drawOnChartArea: true,
-            drawTicks: false,
-            color: 'rgba(0, 0, 0, 0.2)' // Lighter grid lines
-          }
-        },
+scales: {
+  x: { 
+    title: { display: true, text: 'Minutes from now' },
+    ticks: {
+      stepSize: 5,
+      maxTicksLimit: 5, // Show fewer ticks on X-axis
+      autoSkip: true, // Skip extra labels for less clutter
+      includeBounds: true, // Ensures 60 is included in the bounds
+      font: { size: 12 }, 
+      callback: function(value) {
+        if (value === 60) return "60"; // Force 60 to appear
+        return value; // Show other labels normally
+      }
+    },
+    suggestedMin: 0, 
+    suggestedMax: 60, // Ensures 60 is within the range
+    grid: {
+      display: true,
+      drawOnChartArea: true,
+      drawTicks: false,
+      color: 'rgba(0, 0, 0, 0.2)' // Lighter grid lines
+    }
+  },
         y: {
           title: { display: false },
           min: 0,
