@@ -390,7 +390,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             drawOnChartArea: true,
             drawTicks: false,
             color: function(context) {
-              return context.tick.value % 2 === 0 ? 'rgba(255, 255, 255, 0.3)' : 'transparent';
+              return context.tick.value % 2 === 0 ? 'black' : 'transparent';
             } // Show only key grid lines
           }
         }
