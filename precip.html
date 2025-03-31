@@ -365,20 +365,21 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           }
         },
         y: {
-          title: { display: false },
-          min: 0,
-          max: 10, // Fixed scale
-          ticks: {
-            stepSize: 1,
-            callback: function(value) {
-              if (value === 1) return "Light";
-              if (value === 3) return "Moderate";
-              if (value === 7) return "Heavy";
-              if (value === 9) return "Very Heavy"
-              return ""; // Empty string for all other value
-            }
-          }
-        }
+    title: { display: false },
+    min: 0,
+    max: 10, // Fixed range
+    ticks: {
+      stepSize: 0.5, // Ensure labels are placed at consistent intervals
+      autoSkip: false, // Prevent labels from being hidden
+      callback: function(value) {
+        if (value === 0.5) return "Very Light";
+        if (value === 2) return "Light";
+        if (value === 4) return "Moderate";
+        if (value === 6) return "Heavy";
+        if (value === 8) return "Very Heavy";
+        if (value === 10) return ""; // Keep 10 as an empty label
+        return ""; // Hide all other values
+      },
       }
     }
   });
