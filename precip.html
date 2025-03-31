@@ -344,11 +344,9 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           displayColors: false, // Disable the color box
           callbacks: {
             title: function(tooltipItem) {
-              // Display the time as "X mins from now"
               return `${tooltipItem[0].label} mins from now`;
             },
             label: function(tooltipItem) {
-              // Display the precip rate as "Precip Rate: ## per hr"
               return `Precip Rate: ${tooltipItem.raw} per hr`;
             }
           }
@@ -358,11 +356,18 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
         x: { 
           title: { display: true, text: 'Minutes from now' },
           ticks: {
-            stepSize: 5, // Show ticks every 5 minutes
-            maxTicksLimit: 6, // Limit number of ticks to 6 for less clutter
+            stepSize: 5,
+            maxTicksLimit: 5, // Show fewer ticks on X-axis
+            autoSkip: true, // Skip extra labels for less clutter
             font: {
-              size: 12, // Make the ticks smaller
+              size: 12, 
             }
+          },
+          grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            color: 'rgba(255, 255, 255, 0.2)' // Lighter grid lines
           }
         },
         y: {
@@ -370,17 +375,23 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           min: 0,
           max: 10, // Fixed range
           ticks: {
-            stepSize: 0.5, // Ensure labels are placed at consistent intervals
+            stepSize: 2, // Show ticks only at 2, 4, 6, 8
             autoSkip: false, // Prevent labels from being hidden
             callback: function(value) {
-              if (value === 0.5) return "Very Light";
               if (value === 2) return "Light";
               if (value === 4) return "Moderate";
               if (value === 6) return "Heavy";
               if (value === 8) return "Very Heavy";
-              if (value === 10) return ""; // Keep 10 as an empty label
               return ""; // Hide all other values
             }
+          },
+          grid: {
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            color: function(context) {
+              return context.tick.value % 2 === 0 ? 'rgba(255, 255, 255, 0.3)' : 'transparent';
+            } // Show only key grid lines
           }
         }
       }
@@ -392,7 +403,6 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
     myChart.resize();
   });
 }
-
 
 
 
