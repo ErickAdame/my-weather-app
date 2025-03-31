@@ -697,6 +697,8 @@ async function fetchWeatherbitForecast(zipcode) {
   }
 }
 
+
+
 async function fetchHourlyForecast(lat, lon) {
   const apiKey = "155db15cf89682a55503d94f25dc4deb";
 
@@ -705,7 +707,9 @@ async function fetchHourlyForecast(lat, lon) {
   
   // Minutely Forecast API call
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
-  console.log(minutelyUrl);
+
+  // AQI API Call
+  const AQIUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
@@ -715,13 +719,22 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyResponse = await fetch(minutelyUrl);
   const minutelyData = await minutelyResponse.json();
 
+  // Fetch Minutely Forecast
+  const AQIResponse = await fetch(AQIUrl);
+  const AQIData = await AQIResponse.json();
+  console.log(AQIData)
+  
+
+  const aqi = AQIData.list[0].main.aqi;
+  console.log("Extracted AQI:", aqi);
+  
+  updateAQIImage(aqi)
+
+
   // Store the data in localStorage
   localStorage.setItem('hourlyData', JSON.stringify(hourlyData));
   localStorage.setItem('minutelyData', JSON.stringify(minutelyData));
 
-  // Log the data in console for review
-  console.log('Hourly Forecast Data:', hourlyData);
-  console.log('Minutely Forecast Data:', minutelyData);
 
   // Handle Hourly Forecast Display
   const hourlyForecast = document.getElementById("hourlyForecast");
@@ -888,6 +901,26 @@ function getMinutelyForecastMessage(minutelyData) {
     return "No precipitation is expected in the next hour.";
   }
 }
+
+function updateAQIImage(aqi) {
+  const aqiImageMap = {
+      1: 'icons/AQI/AQI Good.png',
+      2: 'icons/AQI/AQI Moderate.png',
+      3: 'icons/AQI/AQI Sensitive.png',
+      4: 'icons/AQI/AQI Unhealthy.png',
+      5: 'icons/AQI/AQI Very Unhealthy.png'
+  };
+  
+  const imageElement = document.getElementById('aqiImage');
+  if (imageElement && aqiImageMap[aqi]) {
+      imageElement.src = aqiImageMap[aqi];
+      imageElement.style.display = 'block'; // Make image visible
+  } else {
+      console.error('Invalid AQI value or image element not found');
+  }
+}
+
+
 
 
 // Call the fetchHourlyAndMinutelyForecast function
