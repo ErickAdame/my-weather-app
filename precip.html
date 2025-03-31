@@ -1,4 +1,4 @@
-e<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -52,8 +52,8 @@ e<!DOCTYPE html>
       overflow: visible !important;
     }
     .precip-daily-chart {
-      padding-left: 15px !important;
-      padding-right: 15px !important;
+      margin-right: 15px !important;
+      margin-left: 15px !important;
     }
     
     .banner {
@@ -367,7 +367,9 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             includeBounds: true,
             font: {
               size: 12, 
-            }
+            },
+          suggestedMin: 0, 
+          suggestedMax: 60, // Ensures 60 is within range
           },
           grid: {
             display: true,
@@ -483,9 +485,6 @@ if (precipDailyLabels.length > 0 && precipDailyValues.length > 0) {
     plugins: [ChartDataLabels] // Load Chart.js Data Labels plugin
   });
 }
-
-
-
 
   </script>
 </body>
