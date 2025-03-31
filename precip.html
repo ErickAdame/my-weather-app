@@ -369,7 +369,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           min: 0,
           max: 10, // Fixed scale
           ticks: {
-            stepSize: 2,
+            stepSize: 1,
             callback: function(value) {
               if (value === 1) return "Light";
               if (value === 3) return "Moderate";
@@ -383,6 +383,11 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
     }
   });
 }
+
+window.addEventListener('resize', function () {
+  myChart.resize();
+});
+
 
 
 // Retrieve daily precipitation probability data from localStorage
