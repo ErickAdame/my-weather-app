@@ -364,6 +364,10 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             stepSize: 5,
             maxTicksLimit: 5, // Show fewer ticks on X-axis
             autoSkip: true, // Skip extra labels for less clutter
+            callback: function(value, index, values) {
+              if (value === 60) return "60"; // Force 60 to appear
+              return value; // Show other labels normally
+            }
             includeBounds: true,
             font: {
               size: 12, 
@@ -375,7 +379,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             display: true,
             drawOnChartArea: true,
             drawTicks: false,
-            color: 'rgba(0, 0, 0, 0.3)' // Lighter grid lines
+            color: 'rgba(0, 0, 0, 0.2)' // Lighter grid lines
           }
         },
         y: {
@@ -399,7 +403,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             drawOnChartArea: true,
             drawTicks: false,
             color: function(context) {
-              return context.tick.value % 2 === 0 ? 'rgba(0, 0, 0, 0.3)' : 'transparent';
+              return context.tick.value % 2 === 0 ? 'rgba(0, 0, 0, 0.2)' : 'transparent';
             } // Show only key grid lines
           }
         }
