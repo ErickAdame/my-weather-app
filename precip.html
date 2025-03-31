@@ -41,7 +41,7 @@
       font-size: 14px;
       color: white;
     }
-    #snow-chart, #precip-hourly-chart, #precip-minutely-chart {
+    #snow-chart, #precip-hourly-chart, #precip-minutely-chart #precip-daily-chart {
       margin-top: 10px;
       margin-bottom: 20px; /* Add spacing between each chart and the next banner */
       width: 100%; /* Make the chart full width */
@@ -367,7 +367,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             display: true,
             drawOnChartArea: true,
             drawTicks: false,
-            color: 'black' // Lighter grid lines
+            color: 'rgba(0, 0, 0, 0.3)' // Lighter grid lines
           }
         },
         y: {
@@ -390,7 +390,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
             drawOnChartArea: true,
             drawTicks: false,
             color: function(context) {
-              return context.tick.value % 2 === 0 ? 'black' : 'transparent';
+              return context.tick.value % 2 === 0 ? 'rgba(0, 0, 0, 0.3)' : 'transparent';
             } // Show only key grid lines
           }
         }
