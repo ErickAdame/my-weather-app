@@ -41,21 +41,20 @@
       font-size: 14px;
       color: white;
     }
-    #snow-chart, #precip-hourly-chart, #precip-minutely-chart {
-      margin-top: 10px;
-      margin-bottom: 20px; /* Add spacing between each chart and the next banner */
-      width: 100%; /* Make the chart full width */
-      max-width: 1000px; /* Set a maximum width for the chart */
-      height: 500px; /* Set a fixed height for the chart */
-      margin-left: 10px;
-      margin-right: 15px;
-      overflow: visible !important;
-    }
-    .precip-daily-chart {
-      margin-right: 15px !important;
-      margin-left: 15px !important;
-    }
-    
+
+    #snow-chart, #precip-hourly-chart, #precip-minutely-chart, #precip-daily-chart {
+   width: 100%;  /* Full width */
+   height: 300px;  /* Fixed height for the chart */
+   margin-top: 10px;
+   margin-bottom: 20px;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+
+
+
+
+
     .banner {
     display: flex;
     align-items: center;
@@ -316,12 +315,11 @@ if (minutelyData && minutelyData.minutely && minutelyData.minutely.length > 0) {
 
 // Create the minutely precipitation chart
 const ctxPrecipMinutely = document.getElementById('precip-minutely-chart').getContext('2d');
-
 if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
   // Cap any value greater than or equal to 9 to 9
   const cappedPrecipValues = precipMinutelyValues.map(value => value >= 9 ? 9 : value);
 
-  const myChart = new Chart(ctxPrecipMinutely, {
+  new Chart(ctxPrecipMinutely, {
     type: 'line',
     data: {
       labels: precipMinutelyLabels,
@@ -340,6 +338,7 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: {
         legend: { display: false }, // Disable the legend
         tooltip: {
@@ -349,72 +348,53 @@ if (precipMinutelyLabels.length > 0 && precipMinutelyValues.length > 0) {
           displayColors: false, // Disable the color box
           callbacks: {
             title: function(tooltipItem) {
+              // Display the time as "X mins from now"
               return `${tooltipItem[0].label} mins from now`;
             },
             label: function(tooltipItem) {
-              return `Precip Rate: ${tooltipItem.raw} per hr`;
+              // Display the precip rate as "Precip Rate: ## per hr"
+              return ``;
             }
           }
         }
       },
-scales: {
-  x: { 
-    title: { display: true, text: 'Minutes from now' },
-    ticks: {
-      stepSize: 15,
-      maxTicksLimit: 5, // Show fewer ticks on X-axis
-      autoSkip: true, // Skip extra labels for less clutter
-      includeBounds: true, // Ensures 60 is included in the bounds
-      font: { size: 12 }, 
-      callback: function(value) {
-        if (value === 60) return "60"; // Force 60 to appear
-        return value; // Show other labels normally
-      }
-    },
-    suggestedMin: 0, 
-    suggestedMax: 60, // Ensures 60 is within the range
-    grid: {
-      display: true,
-      drawOnChartArea: true,
-      drawTicks: false,
-      color: 'rgba(0, 0, 0, 0.2)' // Lighter grid lines
-    }
-  },
+      scales: {
+        x: { 
+          title: { display: true, text: 'Minutes from now' },
+          ticks: {
+            stepSize: 5, // Show ticks every 5 minutes
+            maxTicksLimit: 6, // Limit number of ticks to 6 for less clutter
+            font: {
+              size: 10, // Make the ticks smaller
+            }
+          }
+        },
         y: {
           title: { display: false },
           min: 0,
-          max: 10, // Fixed range
+          max: 10, // Fixed scale
           ticks: {
-            stepSize: 0.5, // Ensure labels are placed at consistent intervals
-            autoSkip: false, // Prevent labels from being hidden
+            maxTickLimit: 6,
+            font: {
+                    size: 8 // Adjust this value to make the font smaller
+                },
+            stepSize: 1,
+
             callback: function(value) {
-              if (value === 1.5) return "Light";
-              if (value === 3.5) return "Moderate";
+              if (value === 1) return "Light";
+              if (value === 3) return "Moderate";
               if (value === 6) return "Heavy";
               if (value === 9) return "Very Heavy";
-              if (value === 10) return ""; // Keep 10 as an empty label
-              return ""; // Hide all other values
+            return ""; // Prevents unnecessary duplicate labels
             }
-          },
-          grid: {
-            display: true,
-            drawOnChartArea: true,
-            drawTicks: false,
-            color: function(context) {
-              return context.tick.value % 2 === 0 ? 'rgba(0, 0, 0, 0.2)' : 'transparent';
-            } // Show only key grid lines
+
+
           }
         }
       }
     }
   });
-
-  // Resize event listener to make the chart responsive
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  });
 }
-
 
 
 // Retrieve daily precipitation probability data from localStorage
@@ -487,6 +467,9 @@ if (precipDailyLabels.length > 0 && precipDailyValues.length > 0) {
     plugins: [ChartDataLabels] // Load Chart.js Data Labels plugin
   });
 }
+
+
+
 
   </script>
 </body>
