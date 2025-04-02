@@ -661,6 +661,8 @@ async function getWeatherByZipCode(zipcode) {
       if (data.cod === 200) {
           updateWeatherDetails(data);
           fetchHourlyForecast(data.coord.lat, data.coord.lon);
+          fetchAQIData(data.coord.lat, data.coord.lon);
+          
           
           await fetchWeatherbitForecast(zipcode);
           await fetchWeatherAlerts(data.coord.lat, data.coord.lon);
@@ -726,6 +728,7 @@ async function fetchAQIData(lat, lon) {
     const todayDate = today.toISOString().split('T')[0];
 
     const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+
   console.log(AQIUrl)
 
     try {
