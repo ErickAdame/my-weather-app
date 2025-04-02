@@ -701,6 +701,7 @@ async function fetchWeatherbitForecast(zipcode) {
 
 async function fetchHourlyForecast(lat, lon) {
   const apiKey = "155db15cf89682a55503d94f25dc4deb";
+  const todayDate = new Date().toISOString().split('T')[0];
 
   // Hourly Forecast API call
   const hourlyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,minutely,alerts&appid=${apiKey}&units=imperial`;
@@ -709,7 +710,7 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
 
   // AQI API Call
-  const AQIUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+  const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
 
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
@@ -725,7 +726,7 @@ async function fetchHourlyForecast(lat, lon) {
   console.log(AQIData)
   
 
-  const aqi = AQIData.list[0].main.aqi;
+  const aqi = AQIData.Category.Number;
   console.log("Extracted AQI:", aqi);
   
   updateAQIImage(aqi)
