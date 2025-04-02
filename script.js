@@ -701,6 +701,8 @@ async function fetchWeatherbitForecast(zipcode) {
 
 async function fetchHourlyForecast(lat, lon) {
   const apiKey = "155db15cf89682a55503d94f25dc4deb";
+  const today = new Date();
+  const todayDate = today.toISOString().split('T')[0];
 
   // Hourly Forecast API call
   const hourlyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,minutely,alerts&appid=${apiKey}&units=imperial`;
