@@ -726,7 +726,7 @@ async function fetchHourlyForecast(lat, lon) {
   console.log(AQIData)
   
 
-  const aqi = AQIData.Category.Number;
+  const aqi = AQIData[0].Category.Number;
   console.log("Extracted AQI:", aqi);
   
   updateAQIImage(aqi)
