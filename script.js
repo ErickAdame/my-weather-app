@@ -711,9 +711,6 @@ async function fetchHourlyForecast(lat, lon) {
   // Minutely Forecast API call
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
 
-  // AQI API Call
-  const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
-
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
   const hourlyData = await hourlyResponse.json();
@@ -722,28 +719,12 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyResponse = await fetch(minutelyUrl);
   const minutelyData = await minutelyResponse.json();
 
-// Fetch AQI Data from AirNow
-const AQIResponse = await fetch(AQIUrl);
-const AQIData = await AQIResponse.json();
-console.log(AQIData); // Log the full response to inspect it
-
-// Extract AQI value from the first item in the response array
-if (AQIData.length > 0) {
-  const aqi = AQIData[0].Category.Number; // Gets the AQI category (1-5)
-  console.log("Extracted AQI:", aqi);
-} else {
-  console.log("No AQI data available.");
-}
-
-  
-  updateAQIImage(aqi)
-
   // Fetch AQI Data from AirNow
-async function fetchAQIData() {
+async function fetchAQIData(lat, lon) {
     const today = new Date();
     const todayDate = today.toISOString().split('T')[0];
 
-    const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=42.8978&longitude=-75.9811&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+    const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
 
     try {
         const AQIResponse = await fetch(AQIUrl);
@@ -959,25 +940,6 @@ function getMinutelyForecastMessage(minutelyData) {
     return "No precipitation is expected in the next hour.";
   }
 }
-
-function updateAQIImage(aqi) {
-  const aqiImageMap = {
-      1: 'icons/AQI/AQI Good.png',
-      2: 'icons/AQI/AQI Moderate.png',
-      3: 'icons/AQI/AQI Sensitive.png',
-      4: 'icons/AQI/AQI Unhealthy.png',
-      5: 'icons/AQI/AQI Very Unhealthy.png'
-  };
-  
-  const imageElement = document.getElementById('aqiImage');
-  if (imageElement && aqiImageMap[aqi]) {
-      imageElement.src = aqiImageMap[aqi];
-      imageElement.style.display = 'block'; // Make image visible
-  } else {
-      console.error('Invalid AQI value or image element not found');
-  }
-}
-
 
 
 
