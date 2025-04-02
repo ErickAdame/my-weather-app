@@ -709,7 +709,7 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
 
   // AQI API Call
-  const AQIUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+  const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
 
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
@@ -719,14 +719,19 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyResponse = await fetch(minutelyUrl);
   const minutelyData = await minutelyResponse.json();
 
-  // Fetch Minutely Forecast
-  const AQIResponse = await fetch(AQIUrl);
-  const AQIData = await AQIResponse.json();
-  console.log(AQIData)
-  
+// Fetch AQI Data from AirNow
+const AQIResponse = await fetch(AQIUrl);
+const AQIData = await AQIResponse.json();
+console.log(AQIData); // Log the full response to inspect it
 
-  const aqi = AQIData.list[0].main.aqi;
+// Extract AQI value from the first item in the response array
+if (AQIData.length > 0) {
+  const aqi = AQIData[0].Category.Number; // Gets the AQI category (1-5)
   console.log("Extracted AQI:", aqi);
+} else {
+  console.log("No AQI data available.");
+}
+
   
   updateAQIImage(aqi)
 
