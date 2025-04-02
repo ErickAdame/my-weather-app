@@ -661,7 +661,6 @@ async function getWeatherByZipCode(zipcode) {
       if (data.cod === 200) {
           updateWeatherDetails(data);
           fetchHourlyForecast(data.coord.lat, data.coord.lon);
-          fetchAQIData(data.coord.lat, data.coord.lon);
           
           
           await fetchWeatherbitForecast(zipcode);
@@ -706,7 +705,6 @@ async function fetchHourlyForecast(lat, lon) {
   const apiKey = "155db15cf89682a55503d94f25dc4deb";
   const today = new Date();
   const todayDate = today.toISOString().split('T')[0];
-  let aqi = null
 
   // Hourly Forecast API call
   const hourlyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,minutely,alerts&appid=${apiKey}&units=imperial`;
@@ -714,6 +712,11 @@ async function fetchHourlyForecast(lat, lon) {
   // Minutely Forecast API call
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
 
+  //AQI Forecast API Call
+  const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+  console.log(AQIUrl)
+
+  
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
   const hourlyData = await hourlyResponse.json();
@@ -722,34 +725,13 @@ async function fetchHourlyForecast(lat, lon) {
   const minutelyResponse = await fetch(minutelyUrl);
   const minutelyData = await minutelyResponse.json();
 
-  // Fetch AQI Data from AirNow
-async function fetchAQIData(lat, lon) {
-    const today = new Date();
-    const todayDate = today.toISOString().split('T')[0];
+  // Fetch AQI Data 
+  const AQIResponse = await fetch(AQIUrl);
+  const AQIData = await AQIResponse.json();
+  console.log(AQIData)
 
-    const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+  const aqi = AQIData[0].Category.Number
 
-  console.log(AQIUrl)
-
-    try {
-        const AQIResponse = await fetch(AQIUrl);
-        const AQIData = await AQIResponse.json();
-        console.log("API Response:", AQIData); // Log to debug
-
-        // Ensure we have valid data
-        if (AQIData.length > 0 && AQIData[0].Category && AQIData[0].Category.Number) {
-            const aqi = AQIData[0].Category.Number; // Extract AQI category (1-5)
-            console.log("Extracted AQI:", aqi);
-
-            // Update the AQI image only if a valid AQI value is found
-            updateAQIImage(aqi);
-        } else {
-            console.warn("No AQI data available or invalid structure.");
-        }
-    } catch (error) {
-        console.error("Error fetching AQI data:", error);
-    }
-}
 
 // Function to update the AQI image
 function updateAQIImage(aqi) {
@@ -771,9 +753,8 @@ function updateAQIImage(aqi) {
 }
 
 // Call the function to fetch AQI data
-fetchAQIData(myLat, myLong);
-
-
+updateAQIImage(aqi);
+ 
 
   // Store the data in localStorage
   localStorage.setItem('hourlyData', JSON.stringify(hourlyData));
