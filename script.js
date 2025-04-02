@@ -738,6 +738,56 @@ if (AQIData.length > 0) {
   
   updateAQIImage(aqi)
 
+  // Fetch AQI Data from AirNow
+async function fetchAQIData() {
+    const today = new Date();
+    const todayDate = today.toISOString().split('T')[0];
+
+    const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=42.8978&longitude=-75.9811&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+
+    try {
+        const AQIResponse = await fetch(AQIUrl);
+        const AQIData = await AQIResponse.json();
+        console.log("API Response:", AQIData); // Log to debug
+
+        // Ensure we have valid data
+        if (AQIData.length > 0 && AQIData[0].Category && AQIData[0].Category.Number) {
+            const aqi = AQIData[0].Category.Number; // Extract AQI category (1-5)
+            console.log("Extracted AQI:", aqi);
+
+            // Update the AQI image only if a valid AQI value is found
+            updateAQIImage(aqi);
+        } else {
+            console.warn("No AQI data available or invalid structure.");
+        }
+    } catch (error) {
+        console.error("Error fetching AQI data:", error);
+    }
+}
+
+// Function to update the AQI image
+function updateAQIImage(aqi) {
+    const aqiImageMap = {
+        1: 'icons/AQI/AQI Good.png',
+        2: 'icons/AQI/AQI Moderate.png',
+        3: 'icons/AQI/AQI Sensitive.png',
+        4: 'icons/AQI/AQI Unhealthy.png',
+        5: 'icons/AQI/AQI Very Unhealthy.png'
+    };
+
+    const imageElement = document.getElementById('aqiImage');
+    if (imageElement && aqiImageMap[aqi]) {
+        imageElement.src = aqiImageMap[aqi];
+        imageElement.style.display = 'block'; // Make image visible
+    } else {
+        console.error("Invalid AQI value or image element not found");
+    }
+}
+
+// Call the function to fetch AQI data
+fetchAQIData();
+
+
 
   // Store the data in localStorage
   localStorage.setItem('hourlyData', JSON.stringify(hourlyData));
