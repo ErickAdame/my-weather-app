@@ -726,6 +726,7 @@ async function fetchAQIData(lat, lon) {
     const todayDate = today.toISOString().split('T')[0];
 
     const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
+  console.log(AQIUrl)
 
     try {
         const AQIResponse = await fetch(AQIUrl);
