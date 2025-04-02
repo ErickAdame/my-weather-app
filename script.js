@@ -766,7 +766,7 @@ function updateAQIImage(aqi) {
 }
 
 // Call the function to fetch AQI data
-fetchAQIData();
+fetchAQIData((myLat, myLong);
 
 
 
