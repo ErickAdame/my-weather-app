@@ -661,6 +661,7 @@ async function getWeatherByZipCode(zipcode) {
       if (data.cod === 200) {
           updateWeatherDetails(data);
           fetchHourlyForecast(data.coord.lat, data.coord.lon);
+          
           await fetchWeatherbitForecast(zipcode);
           await fetchWeatherAlerts(data.coord.lat, data.coord.lon);
       } else {
@@ -766,7 +767,7 @@ function updateAQIImage(aqi) {
 }
 
 // Call the function to fetch AQI data
-fetchAQIData((myLat, myLong);
+fetchAQIData(myLat, myLong);
 
 
 
