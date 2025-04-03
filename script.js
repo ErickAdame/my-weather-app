@@ -128,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closeInput();
   });
 
+
   // Call getWeatherByZipCode every 20 minutes
   setInterval(() => {
     if (!locZipCode) {
@@ -258,6 +259,7 @@ async function getGeoCoords() {
   myLong = position.coords.longitude;
 
   // Now that we have the coordinates, call the function to fetch rain/snow data
+  await fetchAQI(myLat, myLong);
   await getRainSnowData();
 }
 
@@ -661,8 +663,7 @@ async function getWeatherByZipCode(zipcode) {
       if (data.cod === 200) {
           updateWeatherDetails(data);
           fetchHourlyForecast(data.coord.lat, data.coord.lon);
-          
-          
+          fetchAQI(data.coord.lat, data.coord.lon)
           await fetchWeatherbitForecast(zipcode);
           await fetchWeatherAlerts(data.coord.lat, data.coord.lon);
       } else {
@@ -703,8 +704,6 @@ async function fetchWeatherbitForecast(zipcode) {
 
 async function fetchHourlyForecast(lat, lon) {
   const apiKey = "155db15cf89682a55503d94f25dc4deb";
-  const today = new Date();
-  const todayDate = today.toISOString().split('T')[0];
 
   // Hourly Forecast API call
   const hourlyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,minutely,alerts&appid=${apiKey}&units=imperial`;
@@ -712,11 +711,7 @@ async function fetchHourlyForecast(lat, lon) {
   // Minutely Forecast API call
   const minutelyUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=current,daily,hourly,alerts&appid=${apiKey}&units=imperial`;
 
-  //AQI Forecast API Call
-  const AQIUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=${todayDate}&distance=25&API_KEY=51B5B593-AD29-40E7-A748-B7D9747911EB`;
-  console.log(AQIUrl)
 
-  
   // Fetch Hourly Forecast
   const hourlyResponse = await fetch(hourlyUrl);
   const hourlyData = await hourlyResponse.json();
@@ -724,37 +719,8 @@ async function fetchHourlyForecast(lat, lon) {
   // Fetch Minutely Forecast
   const minutelyResponse = await fetch(minutelyUrl);
   const minutelyData = await minutelyResponse.json();
+  
 
-  // Fetch AQI Data 
-  const AQIResponse = await fetch(AQIUrl);
-  const AQIData = await AQIResponse.json();
-  console.log(AQIData)
-
-  const aqi = AQIData[0].Category.Number
-
-
-// Function to update the AQI image
-function updateAQIImage(aqi) {
-    const aqiImageMap = {
-        1: 'icons/AQI/AQI Good.png',
-        2: 'icons/AQI/AQI Moderate.png',
-        3: 'icons/AQI/AQI Sensitive.png',
-        4: 'icons/AQI/AQI Unhealthy.png',
-        5: 'icons/AQI/AQI Very Unhealthy.png'
-    };
-
-    const imageElement = document.getElementById('aqiImage');
-    if (imageElement && aqiImageMap[aqi]) {
-        imageElement.src = aqiImageMap[aqi];
-        imageElement.style.display = 'block'; // Make image visible
-    } else {
-        console.error("Invalid AQI value or image element not found");
-    }
-}
-
-// Call the function to fetch AQI data
-updateAQIImage(aqi);
- 
 
   // Store the data in localStorage
   localStorage.setItem('hourlyData', JSON.stringify(hourlyData));
@@ -929,8 +895,10 @@ function getMinutelyForecastMessage(minutelyData) {
 
 
 
+
 // Call the fetchHourlyAndMinutelyForecast function
 fetchHourlyForecast(myLat, myLong);
+fetchAQI(myLat,myLong);
 
 function updateWeatherDetails(data) {
   document.getElementById("location").textContent = data.name;
@@ -1613,3 +1581,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+async function fetchAQI(lat, lon) {
+  const apiKey = "51B5B593-AD29-40E7-A748-B7D9747911EB";
+  const aqiUrl = `https://www.airnowapi.org/aq/forecast/latLong/?format=application/json&latitude=${lat}&longitude=${lon}&date=2025-04-02&distance=25&API_KEY=${apiKey}`;
+
+  try {
+      const response = await fetch(aqiUrl);
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.length) {
+          throw new Error("No AQI data available");
+      }
+
+      console.log("Full AQI Data:", data);
+      // Find the most recent AQI entry
+      let latestAQICategoryNumber = 0;
+
+      data.forEach(entry => {
+          if (entry.Category?.Number > latestAQICategoryNumber) {
+              latestAQICategoryNumber = entry.Category.Number;
+          }
+      });
+
+      console.log("Extracted AQI Category:", latestAQICategoryNumber);
+      updateAQIImage(latestAQICategoryNumber); // Update AQI image
+
+  } catch (error) {
+      console.error("Error fetching AQI data:", error);
+  }
+ // Log the full API response
+
+}
+
+function updateAQIImage(aqi) {
+  const aqiImageMap = {
+      1: 'icons/AQI/AQI Good.png',
+      2: 'icons/AQI/AQI Moderate.png',
+      3: 'icons/AQI/AQI Sensitive.png',
+      4: 'icons/AQI/AQI Unhealthy.png',
+      5: 'icons/AQI/AQI Very Unhealthy.png'
+  };
+
+  const imageElement = document.getElementById('aqiImage');
+  if (imageElement && aqiImageMap[aqi]) {
+      imageElement.src = aqiImageMap[aqi];
+      imageElement.style.display = 'block'; // Show image
+  } else {
+      console.error("Invalid AQI value or image element not found");
+  }
+}
+
+// Example usage: Call with lat & lon dynamically
+fetchAQI(42.9622, -76.6829);
+
