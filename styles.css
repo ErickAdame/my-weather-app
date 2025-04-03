@@ -824,9 +824,11 @@ button.forecast-toggle:hover {
     display: block; /* Make sure images are block-level elements */
 }
 
+
+
 /* Overlap the images slightly */
 .responsive-image2:not(:first-child) {
-    margin-top: -20px; /* Adjust this value to control the overlap amount */
+    margin-top: -25px; /* Adjust this value to control the overlap amount */
 }
 
 .pollen-image-container {
