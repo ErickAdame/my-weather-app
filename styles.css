@@ -815,6 +815,16 @@ button.forecast-toggle:hover {
     height: auto;
     display: block;
     margin: 10px auto;
+    margin-top: 15px !important;
+}
+
+.responsive-image3 {
+    width:fit-content;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+    margin-bottom: 20px !important;
 }
 
 .responsive-image2 {
@@ -838,5 +848,6 @@ button.forecast-toggle:hover {
     justify-content: center; /* Center the images vertically */
     gap: 0; /* Minimal spacing between the images */
     margin: 0 auto; /* Center the whole container */
+    margin-bottom: 20px !important;
 }
 
