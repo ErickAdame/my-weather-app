@@ -817,4 +817,24 @@ button.forecast-toggle:hover {
     margin: 10px auto;
 }
 
+.responsive-image2 {
+    max-width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    margin: 0; /* No margin between images */
+    display: block; /* Make sure images are block-level elements */
+}
+
+/* Overlap the images slightly */
+.responsive-image2:not(:first-child) {
+    margin-top: -20px; /* Adjust this value to control the overlap amount */
+}
+
+.pollen-image-container {
+    display: flex;
+    flex-direction: column; /* Stack the images vertically */
+    align-items: center;    /* Center images horizontally */
+    justify-content: center; /* Center the images vertically */
+    gap: 0; /* Minimal spacing between the images */
+    margin: 0 auto; /* Center the whole container */
+}
 

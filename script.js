@@ -260,6 +260,7 @@ async function getGeoCoords() {
 
   // Now that we have the coordinates, call the function to fetch rain/snow data
   await fetchAQI(myLat, myLong);
+  await fetchPollenData(myLat, myLong);
   await getRainSnowData();
 }
 
@@ -663,7 +664,8 @@ async function getWeatherByZipCode(zipcode) {
       if (data.cod === 200) {
           updateWeatherDetails(data);
           fetchHourlyForecast(data.coord.lat, data.coord.lon);
-          fetchAQI(data.coord.lat, data.coord.lon)
+          fetchAQI(data.coord.lat, data.coord.lon);
+          fetchPollenData(data.coord.lat, data.coord.lon);
           await fetchWeatherbitForecast(zipcode);
           await fetchWeatherAlerts(data.coord.lat, data.coord.lon);
       } else {
@@ -899,6 +901,7 @@ function getMinutelyForecastMessage(minutelyData) {
 // Call the fetchHourlyAndMinutelyForecast function
 fetchHourlyForecast(myLat, myLong);
 fetchAQI(myLat,myLong);
+fetchPollenData(myLat,myLong);
 
 function updateWeatherDetails(data) {
   document.getElementById("location").textContent = data.name;
@@ -1637,4 +1640,67 @@ function updateAQIImage(aqi) {
 
 // Example usage: Call with lat & lon dynamically
 fetchAQI(42.9622, -76.6829);
+
+
+async function fetchPollenData(lat, lon) {
+  const API_KEY = "AIzaSyDqksaEdqhMsU1WF2pUVLmIcrYXJlUubM8"; // Replace with your actual key
+  const url = `https://pollen.googleapis.com/v1/forecast:lookup?days=1&location.latitude=${lat}&location.longitude=${lon}&key=${API_KEY}`;
+
+
+  try {
+      const response = await fetch(url, {
+          method: "GET",
+          headers: {
+              "Accept": "application/json"
+          }
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+      const data = await response.json();
+      console.log(data)
+
+      // Extract pollen type info
+      const pollenInfo = data.dailyInfo[0].pollenTypeInfo || [];
+
+      // Directly access each pollen type and its category
+      const grassCategory = pollenInfo.find(pollen => pollen.code === "GRASS")?.indexInfo?.category || "default";
+      const treeCategory = pollenInfo.find(pollen => pollen.code === "TREE")?.indexInfo?.category || "default";
+      const weedCategory = pollenInfo.find(pollen => pollen.code === "WEED")?.indexInfo?.category || "default";
+
+      // Log the extracted values to check
+      console.log("Grass Pollen Category:", grassCategory);
+      console.log("Tree Pollen Category:", treeCategory);
+      console.log("Weed Pollen Category:", weedCategory);
+
+      // Mapping function to generate the graphic filename
+      function getPollenGraphic(type, category) {
+          // Capitalize the type (first letter) and lowercase the category
+          const formattedType = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+          const formattedCategory = category.toLowerCase();
+          return `pollenGFX/${formattedType}_${formattedCategory}.png`;
+      }
+
+      // Get the image filenames
+      const grassImage = getPollenGraphic("Grass", grassCategory);
+      const treeImage = getPollenGraphic("Tree", treeCategory);
+      const weedImage = getPollenGraphic("Weed", weedCategory);
+
+      // Log the image filenames to check
+      console.log("Grass Image:", grassImage);
+      console.log("Tree Image:", treeImage);
+      console.log("Weed Image:", weedImage);
+
+      // You can use the image paths now to display them in your HTML
+      // For example, updating image elements in the HTML:
+      document.getElementById('grassImage').src = grassImage;
+      document.getElementById('treeImage').src = treeImage;
+      document.getElementById('weedImage').src = weedImage;
+
+  } catch (error) {
+      console.error("Error fetching pollen data:", error);
+  }
+}
+
+fetchPollenData(37.4414, -122.1412);
 
