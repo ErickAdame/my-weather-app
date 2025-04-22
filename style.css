@@ -201,7 +201,7 @@ body {
 .button-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .toggle-btn {
@@ -327,7 +327,7 @@ body {
 
 /* General event styles */
 .event {
-  background-color: #161616;
+  background-color: rgb(236, 91, 43);
   border-radius: 8px;
   padding: 5px;
   margin: 10px 5px; /* 5px from left/right, a bit tighter overall */

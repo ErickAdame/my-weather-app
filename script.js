@@ -233,7 +233,7 @@ fetchHourlyForecast();
 
 function drawPrecipChart(labels, values) {
   const maxPrecip = Math.max(...values);
-  const yAxisMax = maxPrecip * 3;
+  const yAxisMax = maxPrecip * 3 || 1; // fallback to 1 if all values are 0
 
   const canvas = document.getElementById("precip-hourly-chart");
   const ctx = canvas.getContext("2d");
@@ -244,65 +244,6 @@ function drawPrecipChart(labels, values) {
   }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const allZero = values.every(val => val === 0);
-
-  if (allZero) {
-    // Ensure canvas matches display size to avoid blur/stretch
-    const displayWidth = canvas.clientWidth;
-    const displayHeight = canvas.clientHeight;
-    canvas.width = displayWidth;
-    canvas.height = displayHeight;
-  
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-    // Set font and styles
-    ctx.font = "18px Arial";
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
-    ctx.shadowBlur = 2;
-  
-    // Text and wrapping
-    const message = "Woohoo! No rain is expected in the next 12 hours ☀️";
-    const maxWidth = canvas.width * 0.8;
-    const words = message.split(" ");
-    const lines = [];
-    let currentLine = "";
-  
-    words.forEach(word => {
-      const testLine = currentLine + word + " ";
-      const { width: testWidth } = ctx.measureText(testLine);
-      if (testWidth > maxWidth && currentLine !== "") {
-        lines.push(currentLine.trim());
-        currentLine = word + " ";
-      } else {
-        currentLine = testLine;
-      }
-    });
-  
-    if (currentLine) lines.push(currentLine.trim());
-  
-    // Vertical placement
-    const lineHeight = 28;
-    const totalHeight = lines.length * lineHeight;
-    const startY = (canvas.height - totalHeight) / 2;
-  
-    lines.forEach((line, i) => {
-      ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
-    });
-  
-    return;
-  }
-
-  
-  
-  
-
-  // Otherwise, draw the chart
   window.precipChart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -353,6 +294,7 @@ function drawPrecipChart(labels, values) {
     plugins: [ChartDataLabels]
   });
 }
+
 
 function drawWindChart(labels, windSpeeds, windGusts) {
   const canvas = document.getElementById("wind-hourly-chart");
